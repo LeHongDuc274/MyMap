@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">MyMap</string>
+    <string name="title_activity_maps">MapsActivity</string>
+    <string name="default_info_title">title</string>
+    <string name="default_info_snippet">snippet</string>
+    <string name="go">Go</string>
+    <string name="di">Chỉ Đường</string>
+    <string name="title_activity_choose_local">ChooseLocalActivity</string>
+</resources>
