@@ -23,13 +23,10 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.example.mymap.databinding.ActivityMapsBinding
 import com.example.mymap.fragment.DirectionsFragment
-import com.example.mymap.fragment.DirectionsFragment.Companion.REQUEST_END_LOCAL
-import com.example.mymap.fragment.DirectionsFragment.Companion.REQUEST_START_LOCAL
 import com.example.mymap.viewmodels.MapsViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.*
-import com.google.android.libraries.places.api.model.Place
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -104,6 +101,50 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         map.setOnMapLongClickListener {
             addNewMarker(it)
         }
+        obseverData()
+    }
+
+    private fun obseverData() {
+        viewmodel.isStartDirect.observe(this) {
+            if (it) {
+                // add 2 markers - zoom bound
+                val startPlace = viewmodel.startPlace.value
+                val endPlace = viewmodel.endPlace.value
+                val latLngBounds = LatLngBounds.builder()
+                latLngBounds.include(
+                    LatLng(
+                        startPlace!!.latitude,
+                        startPlace.longtitude
+                    )
+                )
+                latLngBounds.include(
+                    LatLng(
+                        endPlace!!.latitude,
+                        endPlace.longtitude
+                    )
+                )
+                map?.clear()
+                map?.addMarker(
+                    MarkerOptions().position(
+                        LatLng(
+                            startPlace!!.latitude,
+                            startPlace.longtitude
+                        )
+                    ).title(startPlace.title).snippet(startPlace.snippet)
+                )
+                map?.addMarker(
+                    MarkerOptions().position(
+                        LatLng(
+                            endPlace!!.latitude,
+                            endPlace.longtitude
+                        )
+                    ).title(endPlace.title).snippet(endPlace.snippet)
+                )
+                map?.animateCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds.build(),100))
+            } else {
+                Unit
+            }
+        }
     }
 
     private fun addNewMarker(latLng: LatLng) {
@@ -130,6 +171,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         // Set the map's camera position to the current location of the device.
                         lastKnownLocation = task.result
                         if (lastKnownLocation != null) {
+                            viewmodel.lastKnownLocation.value = lastKnownLocation
                             map?.moveCamera(
                                 CameraUpdateFactory.newLatLngZoom(
                                     LatLng(

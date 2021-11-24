@@ -21,6 +21,7 @@ import com.example.mymap.databinding.ActivityChooseLocalBinding
 import com.google.android.gms.maps.model.Marker
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
+import java.io.IOException
 
 class ChooseLocalActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -45,25 +46,29 @@ class ChooseLocalActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
         mMap.setOnMapClickListener {
-            val address = Geocoder(this).getFromLocation(it.latitude, it.longitude, 1)
-            if (address.isNotEmpty()) {
-                marker?.remove()
-                val add = address[0].getAddressLine(0)
-                marker = mMap.addMarker(
-                    MarkerOptions().position(it)
-                        .title("Lat:${it.latitude} , Lon: ${it.longitude}").snippet("$add")
-                )
-                marker?.showInfoWindow()
+            try {
+                val address = Geocoder(this).getFromLocation(it.latitude, it.longitude, 1)
+                if (address.isNotEmpty()) {
+                    marker?.remove()
+                    val add = address[0].getAddressLine(0)
+                    marker = mMap.addMarker(
+                        MarkerOptions().position(it)
+                            .title("Lat:${it.latitude} , Lon: ${it.longitude}").snippet("$add")
+                    )
+                    marker?.showInfoWindow()
+                }
+                marker?.let {
+                    place = MyPlace(
+                        it.position.latitude,
+                        it.position.longitude,
+                        it.title,
+                        it.snippet
+                    )
+                }
+                binding.tvLocal.text = marker?.snippet
+            } catch (e : IOException){
+                e.printStackTrace()
             }
-            marker?.let {
-                place = MyPlace(
-                    it.position.latitude,
-                    it.position.longitude,
-                    it.title,
-                    it.snippet
-                )
-            }
-        binding.tvLocal.text = marker?.snippet
         }
         binding.btnOk.setOnClickListener {
             if (place != null) {

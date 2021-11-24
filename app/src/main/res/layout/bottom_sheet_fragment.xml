@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:paddingBottom="24dp"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:paddingBottom="24dp">
 
     <Button
         android:id="@+id/btn_option_start_local"
@@ -49,8 +49,9 @@
 
     <TextView
         android:id="@+id/tv_start"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/dimen_8"
         android:text="123"
         android:textColor="@color/purple_700"
         android:textSize="12sp"
@@ -102,8 +103,9 @@
 
     <TextView
         android:id="@+id/tv_end"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/dimen_8"
         android:text="123"
         android:textColor="@color/purple_700"
         android:textSize="12sp"
@@ -167,9 +169,9 @@
         android:id="@+id/btn_rotate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_rotate_24"
-        android:backgroundTint="@color/white"
         android:layout_marginHorizontal="@dimen/dimen_8"
+        android:backgroundTint="@color/white"
+        android:src="@drawable/ic_rotate_24"
         app:layout_constraintBottom_toBottomOf="@id/btn_direct"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.061"
