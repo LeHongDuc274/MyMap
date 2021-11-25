@@ -52,7 +52,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/dimen_8"
-        android:text="123"
+        android:text=""
         android:textColor="@color/purple_700"
         android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="@+id/btn_option_start_local"
@@ -106,7 +106,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/dimen_8"
-        android:text="123"
+        android:text=""
         android:textColor="@color/purple_700"
         android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="@+id/btn_option_end_local"
@@ -122,6 +122,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:gravity="center"
+        android:weightSum="3"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -133,8 +134,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="8dp"
-            android:layout_weight="0"
-            android:checked="true"
+            android:layout_weight="1"
             android:text="Car" />
 
         <RadioButton
@@ -142,7 +142,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="8dp"
-            android:layout_weight="0"
+            android:layout_weight="1"
             android:text="Circle" />
 
         <RadioButton
@@ -150,7 +150,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="8dp"
-            android:layout_weight="0"
+            android:layout_weight="1"
+            android:checked="true"
             android:text="Warking" />
     </RadioGroup>
 
@@ -166,7 +167,7 @@
         app:layout_constraintTop_toBottomOf="@+id/group_vehicles" />
 
     <ImageButton
-        android:id="@+id/btn_rotate"
+        android:id="@+id/btn_reverse"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/dimen_8"
@@ -179,31 +180,5 @@
         app:layout_constraintTop_toTopOf="@+id/btn_direct"
         app:layout_constraintVertical_bias="1.0" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:weightSum="2"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_direct">
-
-        <TextView
-            android:id="@+id/tv_distance"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Khoảng cách : 7.2km"
-            android:textSize="12sp" />
-
-        <TextView
-            android:id="@+id/tv_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Thời gian : 40p"
-            android:textSize="12sp" />
-    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

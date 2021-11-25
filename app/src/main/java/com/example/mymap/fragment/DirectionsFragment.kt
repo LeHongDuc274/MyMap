@@ -23,6 +23,7 @@ import com.example.mymap.Contains.Companion.RESULT
 import com.example.mymap.Contains.Companion.SEND_INT_KEY_CODE
 import com.example.mymap.R
 import com.example.mymap.activities.ChooseLocalActivity
+import com.example.mymap.activities.MainActivity
 import com.example.mymap.data.models.MyPlace
 import com.example.mymap.databinding.BottomSheetFragmentBinding
 import com.example.mymap.viewmodels.MapsViewModel
@@ -65,7 +66,15 @@ class DirectionsFragment : BottomSheetDialogFragment() {
         setupMenus()
         setupDirectionButton()
         setupSearchFunc()
+        setupReverse()
+        setupRadiolistener()
         obseverData()
+    }
+
+    private fun setupReverse() {
+        binding.btnReverse.setOnClickListener {
+           Toast.makeText(requireActivity(),viewmodel.reversePlace(),Toast.LENGTH_LONG).show()
+        }
     }
 
     private fun obseverData() {
@@ -75,20 +84,20 @@ class DirectionsFragment : BottomSheetDialogFragment() {
         viewmodel.endPlace.observe(viewLifecycleOwner) {
             binding.tvEnd.text = it.snippet
         }
-        viewmodel.selectionStartPlaceMethod.observe(viewLifecycleOwner){
-            if(it == 3){
+        viewmodel.selectionStartPlaceMethod.observe(viewLifecycleOwner) {
+            if (it == 3) {
                 binding.edtStart.visibility = View.VISIBLE
                 binding.btnStartOk.visibility = View.VISIBLE
-            } else{
+            } else {
                 binding.edtStart.visibility = View.GONE
                 binding.btnStartOk.visibility = View.GONE
             }
         }
-        viewmodel.selectionEndPlaceMethod.observe(viewLifecycleOwner){
-            if(it == 3){
+        viewmodel.selectionEndPlaceMethod.observe(viewLifecycleOwner) {
+            if (it == 3) {
                 binding.edtEnd.visibility = View.VISIBLE
                 binding.btnEndOk.visibility = View.VISIBLE
-            } else{
+            } else {
                 binding.edtEnd.visibility = View.GONE
                 binding.btnEndOk.visibility = View.GONE
             }
@@ -100,6 +109,11 @@ class DirectionsFragment : BottomSheetDialogFragment() {
             if (viewmodel.endPlace.value != null && viewmodel.startPlace.value != null) {
                 // add 2 marker and zoom to bounds, call api draw line
                 viewmodel.isStartDirect.value = true
+                val intent = Intent(requireActivity(), MainActivity::class.java)
+                intent.putExtra("start", viewmodel.startPlace.value)
+                intent.putExtra("end", viewmodel.endPlace.value)
+                intent.putExtra("mode", viewmodel.travelMode.value)
+                startActivity(intent)
             } else {
                 viewmodel.isStartDirect.value = false
                 Toast.makeText(requireActivity(), "Nhập đủ thông tin", Toast.LENGTH_LONG).show()
@@ -124,6 +138,10 @@ class DirectionsFragment : BottomSheetDialogFragment() {
                             viewmodel.selectionStartPlaceMethod.value = 2
                             val intent = Intent(requireActivity(), ChooseLocalActivity::class.java)
                             intent.putExtra(SEND_INT_KEY_CODE, 1)
+                            viewmodel.lastKnownLocation.value?.let {
+                                intent.putExtra("lat",it.latitude)
+                                intent.putExtra("long",it.longitude)
+                            }
                             startForResult.launch(intent)
                             true
                         }
@@ -154,6 +172,11 @@ class DirectionsFragment : BottomSheetDialogFragment() {
                             viewmodel.selectionEndPlaceMethod.value = 2
                             val intent = Intent(requireActivity(), ChooseLocalActivity::class.java)
                             intent.putExtra(SEND_INT_KEY_CODE, 2)
+                            viewmodel.lastKnownLocation.value?.let {
+                                intent.putExtra("lat",it.latitude)
+                                intent.putExtra("long",it.longitude)
+
+                            }
                             startForResult.launch(intent)
                             true
                         }
@@ -169,38 +192,56 @@ class DirectionsFragment : BottomSheetDialogFragment() {
             }
         }
     }
-   private fun setupSearchFunc(){
+    private fun setupRadiolistener(){
+        binding.groupVehicles.setOnCheckedChangeListener { radioGroup, i ->
+            when (i) {
+                R.id.rbtn_car -> {
+                    viewmodel.travelMode.value = "car"
+                }
+                R.id.rbtn_circle -> {
+                    viewmodel.travelMode.value = "scooter"
+                }
+                R.id.rbtn_wark -> {
+                    viewmodel.travelMode.value = "pedestrian"
+                }
+            }
+        }
+    }
+
+    private fun setupSearchFunc() {
         binding.btnStartOk.setOnClickListener {
             val query = binding.edtStart.text.toString()
-            if(!query.isEmpty()){
+            if (!query.isEmpty()) {
                 getSearchPlace(query)?.let {
                     viewmodel.startPlace.value = it
                 }
             }
         }
-       binding.btnEndOk.setOnClickListener {
-           val query = binding.edtEnd.text.toString()
-           if(!query.isEmpty()){
-               getSearchPlace(query)?.let {
-                   viewmodel.endPlace.value = it
-               }
-           }
-       }
+        binding.btnEndOk.setOnClickListener {
+            val query = binding.edtEnd.text.toString()
+            if (!query.isEmpty()) {
+                getSearchPlace(query)?.let {
+                    viewmodel.endPlace.value = it
+                }
+            }
+        }
     }
-    private fun getSearchPlace(query : String):MyPlace?{
-       try {
+
+    private fun getSearchPlace(query: String): MyPlace? {
+        try {
             val address = Geocoder(requireActivity()).getFromLocationName(query, 1)
             if (address.isNotEmpty()) {
                 val lat = address[0].latitude
                 val long = address[0].longitude
                 val snippet = address[0].getAddressLine(0)
-                return MyPlace(lat,long,snippet= snippet)
+                return MyPlace(lat, long, snippet = snippet)
             }
-        } catch (e:IOException){
+        } catch (e: IOException) {
             e.printStackTrace()
         }
         return null
     }
+
     private fun getCurrentPlace(): MyPlace? {
         val local = viewmodel.lastKnownLocation.value
         if (local != null) {

@@ -62,9 +62,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         binding.btnSearch.setOnClickListener {
             val query = binding.edtSearch.text.toString()
             if (!query.isEmpty()) {
-                val address = Geocoder(this).getFromLocationName(query, 1)
+                val address = Geocoder(this).getFromLocationName(query, 5)
                 if (address.isNotEmpty()) {
                     val result = address[0]
+                    Toast.makeText(this,address.size.toString(),Toast.LENGTH_LONG).show()
                     marker?.remove()
                     marker = map?.addMarker(
                         MarkerOptions().position(LatLng(result.latitude, result.longitude))
@@ -97,7 +98,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         this.map = map
         getLocationPermission()
         updateLocationUI()
-        getDeviceLocation()
         map.setOnMapLongClickListener {
             addNewMarker(it)
         }
@@ -234,11 +234,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 if (locationPermissionGranted) {
                     map.isMyLocationEnabled = true
                     map.uiSettings?.isMyLocationButtonEnabled = true
+                    getDeviceLocation()
                 } else {
                     map.isMyLocationEnabled = false
                     map.uiSettings?.isMyLocationButtonEnabled = false
                     lastKnownLocation = null
-                    getLocationPermission()
+//                    getLocationPermission()
                 }
             } catch (e: SecurityException) {
                 Log.e("Exception: %s", e.message, e)

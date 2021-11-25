@@ -6,4 +6,5 @@
     <string name="go">Go</string>
     <string name="di">Chỉ Đường</string>
     <string name="title_activity_choose_local">ChooseLocalActivity</string>
+    <string name="search">Move</string>
 </resources>

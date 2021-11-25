@@ -34,7 +34,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="@string/go"
+        android:text="@string/search"
+        android:textAllCaps="false"
         map:layout_constraintEnd_toEndOf="parent"
         map:layout_constraintTop_toTopOf="parent"
         android:drawableRight="@drawable/ic_baseline_search_24"/>

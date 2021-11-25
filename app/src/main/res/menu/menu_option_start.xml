@@ -2,10 +2,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/start_current_local"
-        android:title="vị trí hiện tại" />
+        android:title="Vị trí hiện tại" />
     <item
         android:id="@+id/start_check_in_map"
-        android:title="chọn trên map" />
+        android:title="Chọn trên map" />
     <item
         android:id="@+id/start_search"
         android:title="Tìm kiếm" />
