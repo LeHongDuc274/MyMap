@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/start_search"
-        android:title="Tìm kiếm" />
-    <item
         android:id="@+id/start_current_local"
         android:title="vị trí hiện tại" />
     <item
         android:id="@+id/start_check_in_map"
         android:title="chọn trên map" />
+    <item
+        android:id="@+id/start_search"
+        android:title="Tìm kiếm" />
 </menu>

@@ -64,6 +64,7 @@ class DirectionsFragment : BottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
         setupMenus()
         setupDirectionButton()
+        setupSearchFunc()
         obseverData()
     }
 
@@ -73,6 +74,24 @@ class DirectionsFragment : BottomSheetDialogFragment() {
         }
         viewmodel.endPlace.observe(viewLifecycleOwner) {
             binding.tvEnd.text = it.snippet
+        }
+        viewmodel.selectionStartPlaceMethod.observe(viewLifecycleOwner){
+            if(it == 3){
+                binding.edtStart.visibility = View.VISIBLE
+                binding.btnStartOk.visibility = View.VISIBLE
+            } else{
+                binding.edtStart.visibility = View.GONE
+                binding.btnStartOk.visibility = View.GONE
+            }
+        }
+        viewmodel.selectionEndPlaceMethod.observe(viewLifecycleOwner){
+            if(it == 3){
+                binding.edtEnd.visibility = View.VISIBLE
+                binding.btnEndOk.visibility = View.VISIBLE
+            } else{
+                binding.edtEnd.visibility = View.GONE
+                binding.btnEndOk.visibility = View.GONE
+            }
         }
     }
 
@@ -94,19 +113,22 @@ class DirectionsFragment : BottomSheetDialogFragment() {
                 // MainActivity implements OnMenuItemClickListener
                 setOnMenuItemClickListener {
                     when (it.itemId) {
-                        R.id.start_search -> {
-                            true
-                        }
                         R.id.start_current_local -> {
                             getCurrentPlace()?.let {
                                 viewmodel.startPlace.value = it
+                                viewmodel.selectionStartPlaceMethod.value = 1
                             }
                             true
                         }
                         R.id.start_check_in_map -> {
+                            viewmodel.selectionStartPlaceMethod.value = 2
                             val intent = Intent(requireActivity(), ChooseLocalActivity::class.java)
                             intent.putExtra(SEND_INT_KEY_CODE, 1)
                             startForResult.launch(intent)
+                            true
+                        }
+                        R.id.start_search -> {
+                            viewmodel.selectionStartPlaceMethod.value = 3
                             true
                         }
                         else -> false
@@ -121,20 +143,22 @@ class DirectionsFragment : BottomSheetDialogFragment() {
                 // MainActivity implements OnMenuItemClickListener
                 setOnMenuItemClickListener {
                     when (it.itemId) {
-                        R.id.start_search -> {
-
-                            true
-                        }
                         R.id.start_current_local -> {
                             getCurrentPlace()?.let {
                                 viewmodel.endPlace.value = it
+                                viewmodel.selectionEndPlaceMethod.value = 1
                             }
                             true
                         }
                         R.id.start_check_in_map -> {
+                            viewmodel.selectionEndPlaceMethod.value = 2
                             val intent = Intent(requireActivity(), ChooseLocalActivity::class.java)
                             intent.putExtra(SEND_INT_KEY_CODE, 2)
                             startForResult.launch(intent)
+                            true
+                        }
+                        R.id.start_search -> {
+                            viewmodel.selectionEndPlaceMethod.value = 3
                             true
                         }
                         else -> false
@@ -145,7 +169,38 @@ class DirectionsFragment : BottomSheetDialogFragment() {
             }
         }
     }
-
+   private fun setupSearchFunc(){
+        binding.btnStartOk.setOnClickListener {
+            val query = binding.edtStart.text.toString()
+            if(!query.isEmpty()){
+                getSearchPlace(query)?.let {
+                    viewmodel.startPlace.value = it
+                }
+            }
+        }
+       binding.btnEndOk.setOnClickListener {
+           val query = binding.edtEnd.text.toString()
+           if(!query.isEmpty()){
+               getSearchPlace(query)?.let {
+                   viewmodel.endPlace.value = it
+               }
+           }
+       }
+    }
+    private fun getSearchPlace(query : String):MyPlace?{
+       try {
+            val address = Geocoder(requireActivity()).getFromLocationName(query, 1)
+            if (address.isNotEmpty()) {
+                val lat = address[0].latitude
+                val long = address[0].longitude
+                val snippet = address[0].getAddressLine(0)
+                return MyPlace(lat,long,snippet= snippet)
+            }
+        } catch (e:IOException){
+            e.printStackTrace()
+        }
+        return null
+    }
     private fun getCurrentPlace(): MyPlace? {
         val local = viewmodel.lastKnownLocation.value
         if (local != null) {
@@ -154,7 +209,7 @@ class DirectionsFragment : BottomSheetDialogFragment() {
                     Geocoder(requireActivity()).getFromLocation(local.latitude, local.longitude, 1)
                 if (address.isNotEmpty()) {
                     val snippet = address[0].getAddressLine(0)
-                  val place = MyPlace(local.latitude,local.longitude,snippet = snippet)
+                    val place = MyPlace(local.latitude, local.longitude, snippet = snippet)
                     return place
                 }
             } catch (e: IOException) {

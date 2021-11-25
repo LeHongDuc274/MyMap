@@ -19,6 +19,10 @@ class MapsViewModel(var app: Application) : AndroidViewModel(app) {
     var endPlace = MutableLiveData<MyPlace>()
     var isStartDirect = MutableLiveData<Boolean>(false)
     var lastKnownLocation = MutableLiveData<Location>()
+
+    var selectionStartPlaceMethod = MutableLiveData<Int>(1)
+    var selectionEndPlaceMethod = MutableLiveData<Int>(1)
+
     fun addNewAddress(latLng: LatLng) {
         val address = Geocoder(app).getFromLocation(latLng.latitude, latLng.longitude, 1)
         if (address[0].maxAddressLineIndex >= 0){
