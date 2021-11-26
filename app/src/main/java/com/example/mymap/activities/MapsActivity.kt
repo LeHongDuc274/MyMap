@@ -65,7 +65,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 val address = Geocoder(this).getFromLocationName(query, 5)
                 if (address.isNotEmpty()) {
                     val result = address[0]
-                    Toast.makeText(this,address.size.toString(),Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, address.size.toString(), Toast.LENGTH_LONG).show()
                     marker?.remove()
                     marker = map?.addMarker(
                         MarkerOptions().position(LatLng(result.latitude, result.longitude))
@@ -140,7 +140,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         )
                     ).title(endPlace.title).snippet(endPlace.snippet)
                 )
-                map?.animateCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds.build(),100))
+                map?.animateCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds.build(), 100))
             } else {
                 Unit
             }

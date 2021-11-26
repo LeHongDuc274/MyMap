@@ -6,6 +6,7 @@ import android.location.Location
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.example.mymap.data.models.MyPlace
+
 class MapsViewModel(var app: Application) : AndroidViewModel(app) {
 
 
@@ -16,13 +17,13 @@ class MapsViewModel(var app: Application) : AndroidViewModel(app) {
     var selectionStartPlaceMethod = MutableLiveData<Int>(1)
     var selectionEndPlaceMethod = MutableLiveData<Int>(1)
     var travelMode = MutableLiveData<String>("")
-    fun reversePlace() :String{
-        if(startPlace.value!=null && endPlace.value!=null) {
+    fun reversePlace(): String {
+        if (startPlace.value != null && endPlace.value != null) {
             val tempPlace = startPlace.value
             startPlace.value = endPlace.value
             endPlace.value = tempPlace
             return "Succesfully"
-        } else{
+        } else {
             return "Error"
         }
     }

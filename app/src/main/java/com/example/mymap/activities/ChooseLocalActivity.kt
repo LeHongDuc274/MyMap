@@ -35,23 +35,21 @@ class ChooseLocalActivity : AppCompatActivity(), OnMapReadyCallback {
     private var lon: Double = 0.0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         binding = ActivityChooseLocalBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
         KEY_CODE = getIntent().getIntExtra(SEND_INT_KEY_CODE, 0)
-        lat = intent.getDoubleExtra("lat",0.0)
-        lon = intent.getDoubleExtra("long",0.0)
-        Log.e("tag","$lat $lon")
+        lat = intent.getDoubleExtra("lat", 0.0)
+        lon = intent.getDoubleExtra("long", 0.0)
+        Log.e("tag", "$lat $lon")
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(lat,lon),15f))
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(lat, lon), 15f))
         mMap.setOnMapClickListener {
             try {
                 val address = Geocoder(this).getFromLocation(it.latitude, it.longitude, 1)

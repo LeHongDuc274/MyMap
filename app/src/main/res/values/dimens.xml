@@ -4,4 +4,5 @@
     <dimen name="dimen_8">8dp</dimen>
     <dimen name="font_size_12">12sp</dimen>
     <dimen name="font_size_medium">16sp</dimen>
+    <dimen name="dimen_16">16dp</dimen>
 </resources>

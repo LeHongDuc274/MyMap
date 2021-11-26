@@ -3,6 +3,9 @@ package com.example.mymap.activities
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import com.example.mymap.Contains.Companion.conVertMetToString
@@ -43,6 +46,13 @@ class MainActivity : AppCompatActivity() {
         mapView = findViewById(R.id.map_view_here)
         mapView.onCreate(savedInstanceState)
         loadMap()
+        initControl()
+    }
+
+    private fun initControl() {
+        findViewById<ImageView>(R.id.iv_back).setOnClickListener {
+            super.onBackPressed()
+        }
     }
 
     private fun addMarker() {
@@ -103,11 +113,15 @@ class MainActivity : AppCompatActivity() {
             routingError: RoutingError?,
             routes: MutableList<Route>?
         ) {
-            if (routingError == null) {
-                val route = routes?.get(0)
-                val route2 = routes?.get(1)
-                showDetail(route!!, route2!!)
-                drawLine(route2, secondaryColor)
+            if (routingError == null && !routes.isNullOrEmpty()) {
+                val size = routes.size
+                if (size >= 2) {
+                    val route2 = routes.get(1)
+                    drawLine(route2, secondaryColor)
+                    showDetail2(route2)
+                }
+                val route = routes.get(0)
+                showDetail(route)
                 drawLine(route, primaryColor)
             } else {
                 Toast.makeText(this@MainActivity, "Không tìm thấy tuyến đường", Toast.LENGTH_LONG)
@@ -133,13 +147,19 @@ class MainActivity : AppCompatActivity() {
         mapView.mapScene.addMapPolyline(routeMapPolyLine)
     }
 
-    private fun showDetail(route: Route, route2: Route) {
+    private fun showDetail(route: Route) {
+        // primary
         val timeCostPrimary = route.durationInSeconds
         val distancePrimary = route.lengthInMeters
-        val timeCostSecondary = route2.durationInSeconds
-        val distanceSecondary = route2.lengthInMeters
         findViewById<TextView>(R.id.tv_distance).text = conVertMetToString(distancePrimary)
         findViewById<TextView>(R.id.tv_time).text = convertTimeToString(timeCostPrimary)
+        findViewById<ProgressBar>(R.id.progress_circular).visibility = View.GONE
+    }
+
+    private fun showDetail2(route2: Route) {
+        // other
+        val timeCostSecondary = route2.durationInSeconds
+        val distanceSecondary = route2.lengthInMeters
         findViewById<TextView>(R.id.tv_distance_second).text = conVertMetToString(distanceSecondary)
         findViewById<TextView>(R.id.tv_time_second).text = convertTimeToString(timeCostSecondary)
     }
