@@ -2,20 +2,15 @@ package com.example.mymap.activities
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.content.pm.PackageManager
-import android.location.Address
-import android.location.Geocoder
 import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import com.example.mymap.R
-import com.example.mymap.data.models.MyPlace
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -56,28 +51,28 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         var fragment = DirectionsFragment()
         binding.fabGo.setOnClickListener {
-            // showCurrentPlace()
             fragment.show(supportFragmentManager, "bottomSheet")
         }
         binding.btnSearch.setOnClickListener {
             val query = binding.edtSearch.text.toString()
             if (!query.isEmpty()) {
-                val address = Geocoder(this).getFromLocationName(query, 5)
-                if (address.isNotEmpty()) {
-                    val result = address[0]
-                    Toast.makeText(this, address.size.toString(), Toast.LENGTH_LONG).show()
+                val address =  viewmodel.getAddressFromName(query)
+                    //Geocoder(this).getFromLocationName(query, 5)
+                if (address!=null) {
+                   // val result = address[0]
+                  //  Toast.makeText(this, address.size.toString(), Toast.LENGTH_LONG).show()
                     marker?.remove()
                     marker = map?.addMarker(
-                        MarkerOptions().position(LatLng(result.latitude, result.longitude))
-                            .title("Lat:${result.latitude} , Lon: ${result.longitude}")
-                            .snippet(result.getAddressLine(0))
+                        MarkerOptions().position(LatLng(address.latitude, address.longitude))
+                            .title("Lat:${address.latitude} , Lon: ${address.longitude}")
+                            .snippet(address.getAddressLine(0))
                     )
                     marker?.showInfoWindow()
                     map?.animateCamera(
                         CameraUpdateFactory.newLatLngZoom(
                             LatLng(
-                                result.latitude,
-                                result.longitude
+                                address.latitude,
+                                address.longitude
                             ), DEFAULT_ZOOM.toFloat()
                         )
                     )
@@ -148,11 +143,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun addNewMarker(latLng: LatLng) {
-        var address = mutableListOf<Address>()
-        address = Geocoder(this).getFromLocation(latLng.latitude, latLng.longitude, 1)
-        if (address.isNotEmpty()) {
+        //var address = mutableListOf<Address>()
+        val address = viewmodel.getAdressFromLocation(latLng)
+        //Geocoder(this).getFromLocation(latLng.latitude, latLng.longitude, 1)
+        if (address!=null) {
             marker?.remove()
-            val add = address[0].getAddressLine(0)
+            val add = address.getAddressLine(0)
             marker = map?.addMarker(
                 MarkerOptions().position(latLng)
                     .title("Lat:${latLng.latitude} , Lon: ${latLng.longitude}").snippet("$add")

@@ -8,10 +8,12 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.lifecycle.ViewModelProvider
 import com.example.mymap.Contains.Companion.conVertMetToString
 import com.example.mymap.Contains.Companion.convertTimeToString
 import com.example.mymap.R
 import com.example.mymap.data.models.MyPlace
+import com.example.mymap.viewmodels.RouteViewModel
 import com.here.sdk.core.*
 import com.here.sdk.core.errors.InstantiationErrorException
 import com.here.sdk.mapview.*
@@ -26,14 +28,14 @@ class MainActivity : AppCompatActivity() {
     private var endPoint: MyPlace? = null
     private var startGeoCoordinates: GeoCoordinates? = null
     private var endGeoCoordinates: GeoCoordinates? = null
-    private var routingEngine: RoutingEngine? = null
     private var travelMode: String = ""
     private var primaryColor = Color.valueOf(0f, 0f, 1f, 0.8f)
     private var secondaryColor = Color.valueOf(0f, 0.5f, 0f, 0.2f)
-
+    lateinit var routeViewModel: RouteViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        routeViewModel = ViewModelProvider(this)[RouteViewModel::class.java]
         startPoint = intent.getSerializableExtra("start") as MyPlace
         endPoint = intent.getSerializableExtra("end") as MyPlace
         travelMode = intent.getStringExtra("mode").toString()
@@ -45,25 +47,32 @@ class MainActivity : AppCompatActivity() {
             GeoCoordinates(endPoint!!.latitude, endPoint!!.longtitude)
         mapView = findViewById(R.id.map_view_here)
         mapView.onCreate(savedInstanceState)
+        obveser()
         loadMap()
         initControl()
+    }
+
+    private fun obveser() {
+        routeViewModel.message.observe(this){
+            Toast.makeText(this,it,Toast.LENGTH_LONG).show()
+        }
+        routeViewModel.routePrimary.observe(this){
+            it?.let { mRoute->
+                drawLine(mRoute,primaryColor)
+                showDetail(mRoute)
+            }
+        }
+        routeViewModel.routeSecond.observe(this){
+            it?.let { mRoute ->
+                drawLine(mRoute,secondaryColor)
+                showDetail2(mRoute)
+            }
+        }
     }
 
     private fun initControl() {
         findViewById<ImageView>(R.id.iv_back).setOnClickListener {
             super.onBackPressed()
-        }
-    }
-
-    private fun addMarker() {
-        val mapImage = MapImageFactory.fromResource(resources, R.drawable.location_pin_40)
-        if (startGeoCoordinates != null && endGeoCoordinates != null) {
-            val listGeoCoordinates = mutableListOf(
-                MapMarker(startGeoCoordinates!!, mapImage),
-                MapMarker(endGeoCoordinates!!, mapImage)
-            )
-            mapView.mapScene.addMapMarkers(listGeoCoordinates)
-            mapView.camera.lookAt(startGeoCoordinates!!, 10000.0)
         }
     }
 
@@ -78,56 +87,24 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
-    private fun addRouter() {
-        try {
-            routingEngine = RoutingEngine()
-        } catch (e: InstantiationErrorException) {
-            throw RuntimeException("Initialization of RoutingEngine failed: " + e.error.name);
-        }
-
-        val startWaypoint = Waypoint(startGeoCoordinates!!)
-        val endWaypoint = Waypoint(endGeoCoordinates!!)
-        val waypoints: List<Waypoint> = ArrayList(Arrays.asList(startWaypoint, endWaypoint))
-        when (travelMode) {
-            "car" -> {
-                val carOptions = CarOptions()
-                carOptions.routeOptions.alternatives = 2
-                routingEngine?.calculateRoute(waypoints, carOptions, callback)
-            }
-            "scooter" -> {
-                val scooterOptions = ScooterOptions()
-                scooterOptions.routeOptions.alternatives = 2
-                routingEngine?.calculateRoute(waypoints, scooterOptions, callback)
-            }
-            else -> {
-                val pedestrianOptions = PedestrianOptions()
-                pedestrianOptions.routeOptions.alternatives = 2
-                routingEngine?.calculateRoute(waypoints, pedestrianOptions, callback)
-            }
+    private fun addMarker() {
+        val mapImage = MapImageFactory.fromResource(resources, R.drawable.location_pin_40)
+        if (startGeoCoordinates != null && endGeoCoordinates != null) {
+            val listGeoCoordinates = mutableListOf(
+                MapMarker(startGeoCoordinates!!, mapImage),
+                MapMarker(endGeoCoordinates!!, mapImage)
+            )
+            mapView.mapScene.addMapMarkers(listGeoCoordinates)
+            mapView.camera.lookAt(startGeoCoordinates!!, 10000.0)
         }
     }
 
-    private val callback = object : CalculateRouteCallback {
-        override fun onRouteCalculated(
-            routingError: RoutingError?,
-            routes: MutableList<Route>?
-        ) {
-            if (routingError == null && !routes.isNullOrEmpty()) {
-                val size = routes.size
-                if (size >= 2) {
-                    val route2 = routes.get(1)
-                    drawLine(route2, secondaryColor)
-                    showDetail2(route2)
-                }
-                val route = routes.get(0)
-                showDetail(route)
-                drawLine(route, primaryColor)
-            } else {
-                Toast.makeText(this@MainActivity, "Không tìm thấy tuyến đường", Toast.LENGTH_LONG)
-                    .show()
-            }
-        }
+
+    private fun addRouter() {
+        val startWaypoint = Waypoint(startGeoCoordinates!!)
+        val endWaypoint = Waypoint(endGeoCoordinates!!)
+        val waypoints: List<Waypoint> = ArrayList(Arrays.asList(startWaypoint, endWaypoint))
+        routeViewModel.calculRoute(travelMode,waypoints)
     }
 
     private fun drawLine(route: Route, color: Color) {

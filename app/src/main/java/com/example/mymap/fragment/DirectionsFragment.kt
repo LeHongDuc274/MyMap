@@ -1,19 +1,12 @@
 package com.example.mymap.fragment
 
 import android.annotation.SuppressLint
-import android.app.Activity.RESULT_OK
-import android.content.Context
 import android.content.Intent
-import android.location.Geocoder
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
 import android.widget.Toast
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.PopupMenu
 import androidx.lifecycle.ViewModelProvider
@@ -27,9 +20,8 @@ import com.example.mymap.activities.MainActivity
 import com.example.mymap.data.models.MyPlace
 import com.example.mymap.databinding.BottomSheetFragmentBinding
 import com.example.mymap.viewmodels.MapsViewModel
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import java.io.IOException
 
 class DirectionsFragment : BottomSheetDialogFragment() {
     private var _binding: BottomSheetFragmentBinding? = null
@@ -73,7 +65,7 @@ class DirectionsFragment : BottomSheetDialogFragment() {
 
     private fun setupReverse() {
         binding.btnReverse.setOnClickListener {
-           Toast.makeText(requireActivity(),viewmodel.reversePlace(),Toast.LENGTH_LONG).show()
+            Toast.makeText(requireActivity(), viewmodel.reversePlace(), Toast.LENGTH_LONG).show()
         }
     }
 
@@ -139,8 +131,8 @@ class DirectionsFragment : BottomSheetDialogFragment() {
                             val intent = Intent(requireActivity(), ChooseLocalActivity::class.java)
                             intent.putExtra(SEND_INT_KEY_CODE, 1)
                             viewmodel.lastKnownLocation.value?.let {
-                                intent.putExtra("lat",it.latitude)
-                                intent.putExtra("long",it.longitude)
+                                intent.putExtra("lat", it.latitude)
+                                intent.putExtra("long", it.longitude)
                             }
                             startForResult.launch(intent)
                             true
@@ -173,8 +165,8 @@ class DirectionsFragment : BottomSheetDialogFragment() {
                             val intent = Intent(requireActivity(), ChooseLocalActivity::class.java)
                             intent.putExtra(SEND_INT_KEY_CODE, 2)
                             viewmodel.lastKnownLocation.value?.let {
-                                intent.putExtra("lat",it.latitude)
-                                intent.putExtra("long",it.longitude)
+                                intent.putExtra("lat", it.latitude)
+                                intent.putExtra("long", it.longitude)
 
                             }
                             startForResult.launch(intent)
@@ -192,7 +184,8 @@ class DirectionsFragment : BottomSheetDialogFragment() {
             }
         }
     }
-    private fun setupRadiolistener(){
+
+    private fun setupRadiolistener() {
         binding.groupVehicles.setOnCheckedChangeListener { radioGroup, i ->
             when (i) {
                 R.id.rbtn_car -> {
@@ -228,16 +221,13 @@ class DirectionsFragment : BottomSheetDialogFragment() {
     }
 
     private fun getSearchPlace(query: String): MyPlace? {
-        try {
-            val address = Geocoder(requireActivity()).getFromLocationName(query, 1)
-            if (address.isNotEmpty()) {
-                val lat = address[0].latitude
-                val long = address[0].longitude
-                val snippet = address[0].getAddressLine(0)
-                return MyPlace(lat, long, snippet = snippet)
-            }
-        } catch (e: IOException) {
-            e.printStackTrace()
+        val address = viewmodel.getAddressFromName(query)
+        //Geocoder(requireActivity()).getFromLocationName(query, 1)
+        if (address != null) {
+            val lat = address.latitude
+            val long = address.longitude
+            val snippet = address.getAddressLine(0)
+            return MyPlace(lat, long, snippet = snippet)
         }
         return null
     }
@@ -245,17 +235,14 @@ class DirectionsFragment : BottomSheetDialogFragment() {
     private fun getCurrentPlace(): MyPlace? {
         val local = viewmodel.lastKnownLocation.value
         if (local != null) {
-            try {
                 val address =
-                    Geocoder(requireActivity()).getFromLocation(local.latitude, local.longitude, 1)
-                if (address.isNotEmpty()) {
-                    val snippet = address[0].getAddressLine(0)
+                    viewmodel.getAdressFromLocation(LatLng(local.latitude, local.longitude))
+                //  Geocoder(requireActivity()).getFromLocation(local.latitude, local.longitude, 1)
+                if (address != null) {
+                    val snippet = address.getAddressLine(0)
                     val place = MyPlace(local.latitude, local.longitude, snippet = snippet)
                     return place
                 }
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
         }
         return null
     }
