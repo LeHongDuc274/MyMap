@@ -32,10 +32,20 @@ class MainActivity : AppCompatActivity() {
     private var primaryColor = Color.valueOf(0f, 0f, 1f, 0.8f)
     private var secondaryColor = Color.valueOf(0f, 0.5f, 0f, 0.2f)
     lateinit var routeViewModel: RouteViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         routeViewModel = ViewModelProvider(this)[RouteViewModel::class.java]
+        getArgs()
+        mapView = findViewById(R.id.map_view_here)
+        mapView.onCreate(savedInstanceState)
+        obveser()
+        loadMap()
+        initControl()
+    }
+
+    private fun getArgs() {
         startPoint = intent.getSerializableExtra("start") as MyPlace
         endPoint = intent.getSerializableExtra("end") as MyPlace
         travelMode = intent.getStringExtra("mode").toString()
@@ -45,26 +55,21 @@ class MainActivity : AppCompatActivity() {
         )
         if (endPoint != null) endGeoCoordinates =
             GeoCoordinates(endPoint!!.latitude, endPoint!!.longtitude)
-        mapView = findViewById(R.id.map_view_here)
-        mapView.onCreate(savedInstanceState)
-        obveser()
-        loadMap()
-        initControl()
     }
 
     private fun obveser() {
-        routeViewModel.message.observe(this){
-            Toast.makeText(this,it,Toast.LENGTH_LONG).show()
+        routeViewModel.message.observe(this) {
+            Toast.makeText(this, it, Toast.LENGTH_LONG).show()
         }
-        routeViewModel.routePrimary.observe(this){
-            it?.let { mRoute->
-                drawLine(mRoute,primaryColor)
+        routeViewModel.routePrimary.observe(this) {
+            it?.let { mRoute ->
+                drawLine(mRoute, primaryColor)
                 showDetail(mRoute)
             }
         }
-        routeViewModel.routeSecond.observe(this){
+        routeViewModel.routeSecond.observe(this) {
             it?.let { mRoute ->
-                drawLine(mRoute,secondaryColor)
+                drawLine(mRoute, secondaryColor)
                 showDetail2(mRoute)
             }
         }
@@ -83,10 +88,10 @@ class MainActivity : AppCompatActivity() {
                 addRouter()
             } else {
                 Toast.makeText(this, "Không thể tải bản đồ", Toast.LENGTH_SHORT).show()
-                Log.e("tag", "error")
             }
         }
     }
+
     private fun addMarker() {
         val mapImage = MapImageFactory.fromResource(resources, R.drawable.location_pin_40)
         if (startGeoCoordinates != null && endGeoCoordinates != null) {
@@ -99,12 +104,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
     private fun addRouter() {
         val startWaypoint = Waypoint(startGeoCoordinates!!)
         val endWaypoint = Waypoint(endGeoCoordinates!!)
         val waypoints: List<Waypoint> = ArrayList(Arrays.asList(startWaypoint, endWaypoint))
-        routeViewModel.calculRoute(travelMode,waypoints)
+        routeViewModel.calculRoute(travelMode, waypoints)
     }
 
     private fun drawLine(route: Route, color: Color) {
@@ -115,12 +119,7 @@ class MainActivity : AppCompatActivity() {
         } catch (e: InstantiationErrorException) {
             return
         }
-        //val listGeoCoordinates = routerGeoPolyLine.vertices
-        val routeMapPolyLine = MapPolyline(
-            routerGeoPolyLine,
-            widthInPixels,
-            color
-        )
+        val routeMapPolyLine = MapPolyline(routerGeoPolyLine, widthInPixels, color)
         mapView.mapScene.addMapPolyline(routeMapPolyLine)
     }
 
@@ -134,7 +133,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showDetail2(route2: Route) {
-        // other
+        // second route
         val timeCostSecondary = route2.durationInSeconds
         val distanceSecondary = route2.lengthInMeters
         findViewById<TextView>(R.id.tv_distance_second).text = conVertMetToString(distanceSecondary)

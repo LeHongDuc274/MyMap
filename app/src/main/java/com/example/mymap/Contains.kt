@@ -8,6 +8,7 @@ class Contains {
         const val KEY_CODE_START = 1
         const val KEY_CODE_END = 2
         const val RESULT = "result"
+
         fun convertTimeToString(sec: Int): String {
             val hours = (sec / 3600)
             val minutes = (sec % 3600 / 60)

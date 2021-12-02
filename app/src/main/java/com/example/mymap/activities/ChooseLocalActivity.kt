@@ -33,6 +33,7 @@ class ChooseLocalActivity : AppCompatActivity(), OnMapReadyCallback {
     private var KEY_CODE: Int = 0
     private var lat: Double = 0.0
     private var lon: Double = 0.0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityChooseLocalBinding.inflate(layoutInflater)
@@ -41,10 +42,7 @@ class ChooseLocalActivity : AppCompatActivity(), OnMapReadyCallback {
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
-        KEY_CODE = getIntent().getIntExtra(SEND_INT_KEY_CODE, 0)
-        lat = intent.getDoubleExtra("lat", 0.0)
-        lon = intent.getDoubleExtra("long", 0.0)
-        Log.e("tag", "$lat $lon")
+        getArgs()
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -63,12 +61,8 @@ class ChooseLocalActivity : AppCompatActivity(), OnMapReadyCallback {
                     marker?.showInfoWindow()
                 }
                 marker?.let {
-                    place = MyPlace(
-                        it.position.latitude,
-                        it.position.longitude,
-                        it.title,
-                        it.snippet
-                    )
+                    place =
+                        MyPlace(it.position.latitude, it.position.longitude, it.title, it.snippet)
                 }
                 binding.tvLocal.text = marker?.snippet
             } catch (e: IOException) {
@@ -87,5 +81,11 @@ class ChooseLocalActivity : AppCompatActivity(), OnMapReadyCallback {
                 finish()
             }
         }
+    }
+    private fun getArgs(){
+        KEY_CODE = getIntent().getIntExtra(SEND_INT_KEY_CODE, 0)
+        lat = intent.getDoubleExtra("lat", 0.0)
+        lon = intent.getDoubleExtra("long", 0.0)
+        Log.e("tag", "$lat $lon")
     }
 }

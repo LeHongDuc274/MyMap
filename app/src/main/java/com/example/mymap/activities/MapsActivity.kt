@@ -56,11 +56,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         binding.btnSearch.setOnClickListener {
             val query = binding.edtSearch.text.toString()
             if (!query.isEmpty()) {
-                val address =  viewmodel.getAddressFromName(query)
-                    //Geocoder(this).getFromLocationName(query, 5)
-                if (address!=null) {
-                   // val result = address[0]
-                  //  Toast.makeText(this, address.size.toString(), Toast.LENGTH_LONG).show()
+                val address = viewmodel.getAddressFromName(query)
+                //Geocoder(this).getFromLocationName(query, 5)
+                if (address != null) {
+                    // val result = address[0]
+                    //  Toast.makeText(this, address.size.toString(), Toast.LENGTH_LONG).show()
                     marker?.remove()
                     marker = map?.addMarker(
                         MarkerOptions().position(LatLng(address.latitude, address.longitude))
@@ -106,34 +106,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 val startPlace = viewmodel.startPlace.value
                 val endPlace = viewmodel.endPlace.value
                 val latLngBounds = LatLngBounds.builder()
-                latLngBounds.include(
-                    LatLng(
-                        startPlace!!.latitude,
-                        startPlace.longtitude
-                    )
-                )
-                latLngBounds.include(
-                    LatLng(
-                        endPlace!!.latitude,
-                        endPlace.longtitude
-                    )
-                )
+                latLngBounds.include(LatLng(startPlace!!.latitude, startPlace.longtitude))
+                latLngBounds.include(LatLng(endPlace!!.latitude, endPlace.longtitude))
                 map?.clear()
                 map?.addMarker(
-                    MarkerOptions().position(
-                        LatLng(
-                            startPlace!!.latitude,
-                            startPlace.longtitude
-                        )
-                    ).title(startPlace.title).snippet(startPlace.snippet)
+                    MarkerOptions().position(LatLng(startPlace.latitude, startPlace.longtitude))
+                        .title(startPlace.title).snippet(startPlace.snippet)
                 )
                 map?.addMarker(
-                    MarkerOptions().position(
-                        LatLng(
-                            endPlace!!.latitude,
-                            endPlace.longtitude
-                        )
-                    ).title(endPlace.title).snippet(endPlace.snippet)
+                    MarkerOptions().position(LatLng(endPlace.latitude, endPlace.longtitude))
+                        .title(endPlace.title).snippet(endPlace.snippet)
                 )
                 map?.animateCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds.build(), 100))
             } else {
@@ -143,10 +125,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun addNewMarker(latLng: LatLng) {
-        //var address = mutableListOf<Address>()
         val address = viewmodel.getAdressFromLocation(latLng)
-        //Geocoder(this).getFromLocation(latLng.latitude, latLng.longitude, 1)
-        if (address!=null) {
+        if (address != null) {
             marker?.remove()
             val add = address.getAddressLine(0)
             marker = map?.addMarker(
@@ -178,10 +158,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                             )
                         }
                     } else {
-                        map?.moveCamera(
-                            CameraUpdateFactory
-                                .newLatLngZoom(defaultLocation, DEFAULT_ZOOM.toFloat())
-                        )
+                        map?.moveCamera(CameraUpdateFactory.newLatLngZoom(defaultLocation, DEFAULT_ZOOM.toFloat()))
                         map?.uiSettings?.isMyLocationButtonEnabled = false
                     }
                 }
@@ -235,7 +212,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     map.isMyLocationEnabled = false
                     map.uiSettings?.isMyLocationButtonEnabled = false
                     lastKnownLocation = null
-//                    getLocationPermission()
                 }
             } catch (e: SecurityException) {
                 Log.e("Exception: %s", e.message, e)

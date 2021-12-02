@@ -7,11 +7,12 @@ import androidx.lifecycle.MutableLiveData
 import com.here.sdk.core.errors.InstantiationErrorException
 import com.here.sdk.routing.*
 
-class RouteViewModel(var app:Application) :AndroidViewModel(app) {
+class RouteViewModel(var app: Application) : AndroidViewModel(app) {
     var routePrimary = MutableLiveData<Route>()
     var routeSecond = MutableLiveData<Route>()
     var message = MutableLiveData<String>()
     private var routingEngine: RoutingEngine? = null
+
     init {
         try {
             routingEngine = RoutingEngine()
@@ -19,8 +20,9 @@ class RouteViewModel(var app:Application) :AndroidViewModel(app) {
             throw RuntimeException("Initialization of RoutingEngine failed: " + e.error.name);
         }
     }
-    fun calculRoute(travelMode: String = "",waypoints: List<Waypoint>){
-        when(travelMode){
+
+    fun calculRoute(travelMode: String = "", waypoints: List<Waypoint>) {
+        when (travelMode) {
             "car" -> {
                 val carOptions = CarOptions()
                 carOptions.routeOptions.alternatives = 2
@@ -38,6 +40,7 @@ class RouteViewModel(var app:Application) :AndroidViewModel(app) {
             }
         }
     }
+
     private val callback = object : CalculateRouteCallback {
         override fun onRouteCalculated(
             routingError: RoutingError?,

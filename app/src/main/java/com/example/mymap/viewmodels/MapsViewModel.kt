@@ -19,6 +19,7 @@ class MapsViewModel(var app: Application) : AndroidViewModel(app) {
     var selectionStartPlaceMethod = MutableLiveData<Int>(1)
     var selectionEndPlaceMethod = MutableLiveData<Int>(1)
     var travelMode = MutableLiveData<String>("")
+
     fun reversePlace(): String {
         if (startPlace.value != null && endPlace.value != null) {
             val tempPlace = startPlace.value

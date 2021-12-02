@@ -127,14 +127,7 @@ class DirectionsFragment : BottomSheetDialogFragment() {
                             true
                         }
                         R.id.start_check_in_map -> {
-                            viewmodel.selectionStartPlaceMethod.value = 2
-                            val intent = Intent(requireActivity(), ChooseLocalActivity::class.java)
-                            intent.putExtra(SEND_INT_KEY_CODE, 1)
-                            viewmodel.lastKnownLocation.value?.let {
-                                intent.putExtra("lat", it.latitude)
-                                intent.putExtra("long", it.longitude)
-                            }
-                            startForResult.launch(intent)
+                            openActivityForResult()
                             true
                         }
                         R.id.start_search -> {
@@ -161,15 +154,7 @@ class DirectionsFragment : BottomSheetDialogFragment() {
                             true
                         }
                         R.id.start_check_in_map -> {
-                            viewmodel.selectionEndPlaceMethod.value = 2
-                            val intent = Intent(requireActivity(), ChooseLocalActivity::class.java)
-                            intent.putExtra(SEND_INT_KEY_CODE, 2)
-                            viewmodel.lastKnownLocation.value?.let {
-                                intent.putExtra("lat", it.latitude)
-                                intent.putExtra("long", it.longitude)
-
-                            }
-                            startForResult.launch(intent)
+                            openActivityForResult()
                             true
                         }
                         R.id.start_search -> {
@@ -235,15 +220,26 @@ class DirectionsFragment : BottomSheetDialogFragment() {
     private fun getCurrentPlace(): MyPlace? {
         val local = viewmodel.lastKnownLocation.value
         if (local != null) {
-                val address =
-                    viewmodel.getAdressFromLocation(LatLng(local.latitude, local.longitude))
-                //  Geocoder(requireActivity()).getFromLocation(local.latitude, local.longitude, 1)
-                if (address != null) {
-                    val snippet = address.getAddressLine(0)
-                    val place = MyPlace(local.latitude, local.longitude, snippet = snippet)
-                    return place
-                }
+            val address =
+                viewmodel.getAdressFromLocation(LatLng(local.latitude, local.longitude))
+            //  Geocoder(requireActivity()).getFromLocation(local.latitude, local.longitude, 1)
+            if (address != null) {
+                val snippet = address.getAddressLine(0)
+                val place = MyPlace(local.latitude, local.longitude, snippet = snippet)
+                return place
+            }
         }
         return null
+    }
+
+    private fun openActivityForResult() {
+        viewmodel.selectionStartPlaceMethod.value = 2
+        val intent = Intent(requireActivity(), ChooseLocalActivity::class.java)
+        intent.putExtra(SEND_INT_KEY_CODE, 1)
+        viewmodel.lastKnownLocation.value?.let {
+            intent.putExtra("lat", it.latitude)
+            intent.putExtra("long", it.longitude)
+        }
+        startForResult.launch(intent)
     }
 }
